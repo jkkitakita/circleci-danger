@@ -3,7 +3,7 @@ FROM ruby:2.3.1-alpine
 ARG VCS_REF
 ARG BUILD_DATE
 LABEL maintainer="jkkitakita (Jun Kitamura)" \
-      org.label-schema.url="https://jkkitakita.com" \
+      org.label-schema.url="http://jkkitakita.com" \
       org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-url="https://github.com/jkkitakita/circleci-danger"\
       org.label-schema.vcs-ref=$VCS_REF

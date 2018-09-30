@@ -23,11 +23,13 @@ docker pull jkkitakita/circleci-danger
 
 ## Getting Started for CircleCI's setting
 
-1. Setting up for danger to use  
-https://danger.systems/guides/getting_started.html#setting-up-an-access-token
-2. Setting up Contexts or Project's Environments of CircleCI for danger  
+1. Setting up for danger to use with CircleCI  
+https://danger.systems/guides/getting_started.html#setting-up-an-access-token  
+ex. Add `DANGER_GITHUB_API_TOKEN` to Project's Environments or Contexts  
+cf. CircleCI 2.0 - Contexts
 https://circleci.com/docs/2.0/contexts/
-3. Add danger job to `.circleci/config.yml`
+
+2. Add danger job to `.circleci/config.yml`
 
 ```
 ## Example of .circleci/config.yml
@@ -47,22 +49,8 @@ workflows:
   version: 2
   danger:
     jobs:
-      - danger:
-        # When you use contexts
-          context: danger
-
-  # Execute periodically to update PR status
-  # HACK: If create or modify of PR can be trigger it may be deleted
-  scheduled-workflow:
-    triggers:
-      - schedule:
-          cron: "0 18 * * *"
-          filters:
-            branches:
-              ignore:
-                - master
-    jobs:
-      - danger:
-          # When you use contexts
-          context: danger
+      - danger
+      # When you use contexts
+      # - danger:
+      #     context: danger
 ```

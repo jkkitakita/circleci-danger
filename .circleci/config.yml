@@ -6,7 +6,7 @@ references:
       - image: google/cloud-sdk
     environment:
       DOCKERHUB_ORG_NAME: jkkitakita
-      ORG_PATH: "github.com/jkkitakita"
+      ORG_PATH: github.com/jkkitakita
       REPO_PATH: "${ORG_PATH}/${CIRCLE_PROJECT_REPONAME}"
       BASH_ENV: .circleci/checktag.sh
   install_docker_client: &install_docker_client
@@ -69,7 +69,7 @@ jobs:
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push ${DOCKERHUB_ORG_NAME}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}
             docker push ${DOCKERHUB_ORG_NAME}/${CIRCLE_PROJECT_REPONAME}:latest
-            # curl -X POST https://hooks.microbadger.com/images/${DOCKERHUB_ORG_NAME}/${CIRCLE_PROJECT_REPONAME}/
+            curl -X POST https://hooks.microbadger.com/images/${DOCKERHUB_ORG_NAME}/${CIRCLE_PROJECT_REPONAME}/5c6cS3A8J17JifhhIPVm-rH9ILQ=
             
 workflows:
   version: 2
