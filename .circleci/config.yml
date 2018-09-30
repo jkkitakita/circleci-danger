@@ -1,0 +1,90 @@
+version: 2.0
+
+references:
+  container_config: &container_config
+    docker:
+      - image: google/cloud-sdk
+    environment:
+      DOCKERHUB_ORG_NAME: jkkitakita
+      ORG_PATH: "github.com/jkkitakita"
+      REPO_PATH: "${ORG_PATH}/${CIRCLE_PROJECT_REPONAME}"
+      BASH_ENV: .circleci/checktag.sh
+  install_docker_client: &install_docker_client
+    run:
+      name: Install docker client
+      command: |
+        set -x
+        VER="18.06.1-ce"
+        curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
+        tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+        mv /tmp/docker/* /usr/bin
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: ~/images
+
+jobs:
+  build_container:
+    <<: *container_config
+    steps:
+      - checkout
+      - setup_remote_docker
+      - *install_docker_client
+      - run:
+          name: Build container images
+          command: |
+            docker build \
+              --tag "${DOCKERHUB_ORG_NAME}/${CIRCLE_PROJECT_REPONAME}:${version}" \
+              --build-arg VCS_REF=`git rev-parse --short HEAD` \
+              --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` .
+            docker images
+      - run:
+          name: Save container image to workspace
+          command: |
+            [ ! -d ~/images ] && mkdir ~/images
+            docker save -o ~/images/${CIRCLE_PROJECT_REPONAME}-${version}.tar "${DOCKERHUB_ORG_NAME}/${CIRCLE_PROJECT_REPONAME}:${version}"
+            ls ~/images
+      - persist_to_workspace:
+          root: ~/images
+          paths:
+            - .
+
+  push_container:
+    <<: *container_config
+    steps:
+      - *attach_workspace
+      - setup_remote_docker
+      - *install_docker_client
+      - run:
+          name: Load Docker image from workspaces
+          command: |
+            ls ~/images
+            docker load -i ~/images/${CIRCLE_PROJECT_REPONAME}-${CIRCLE_TAG}.tar
+            docker images
+      - run:
+          name: Tagging Docker images to latest
+          command: docker tag ${DOCKERHUB_ORG_NAME}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG} ${DOCKERHUB_ORG_NAME}/${CIRCLE_PROJECT_REPONAME}:latest
+      - run:
+          name: Login and push container registries
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push ${DOCKERHUB_ORG_NAME}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}
+            docker push ${DOCKERHUB_ORG_NAME}/${CIRCLE_PROJECT_REPONAME}:latest
+            # curl -X POST https://hooks.microbadger.com/images/${DOCKERHUB_ORG_NAME}/${CIRCLE_PROJECT_REPONAME}/
+            
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build_container:
+          filters:
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)*(-.*)*/ 
+      - push_container:
+          context: container-registory
+          requires:
+            - build_container
+          filters:
+            tags:
+              only: /^v[0-9]+(\.[0-9]+)*(-.*)*/
+            branches:
+              ignore: /.*/
