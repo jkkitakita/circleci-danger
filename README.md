@@ -42,7 +42,7 @@ jobs:
       - image: jkkitakita/circleci-danger
     steps:
       - checkout
-      - run: cp ~/danger/Dangerfile .
+      - run: cp -f ~/danger/Dangerfile .
       - run: bundle exec danger --fail-on-errors=true
 
 workflows:
