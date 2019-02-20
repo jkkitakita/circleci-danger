@@ -2,6 +2,7 @@
 [![](https://images.microbadger.com/badges/version/jkkitakita/circleci-danger.svg)](https://microbadger.com/images/jkkitakita/circleci-danger "Get your own version badge on microbadger.com")
 [![](https://images.microbadger.com/badges/image/jkkitakita/circleci-danger.svg)](https://microbadger.com/images/jkkitakita/circleci-danger "Get your own image badge on microbadger.com")
 [![](https://images.microbadger.com/badges/commit/jkkitakita/circleci-danger.svg)](https://microbadger.com/images/jkkitakita/circleci-danger "Get your own commit badge on microbadger.com")
+[![Known Vulnerabilities](https://snyk.io/test/github/jkkitakita/circleci-danger/badge.svg)](https://snyk.io/test/github/jkkitakita/circleci-danger)
 
 # circleci-danger
 
